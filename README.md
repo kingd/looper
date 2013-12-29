@@ -6,7 +6,8 @@ Loop part of the song in Rhythmbox.
 Screenshots
 -----------
 
-![](https://github.com/kingd/looper/looper.png)
+![](http://image.bayimg.com/c8a2d58cae0089822ea946967a820ebe2a4b4824.jpg)
+
 
 ## Install
 
