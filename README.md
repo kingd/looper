@@ -27,7 +27,7 @@ disabled when the Looper is in control of the playback.
 Rhythmbox also changes to next song if the song is less than 3 seconds before the end.
 Therefore those last 3 seconds wont be available for looping.
 
-Currently only tested on Rhythmbox 2.97.
+Currently tested only on Rhythmbox 2.97 and 2.99.1
 
 ## TODO
 
