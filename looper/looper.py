@@ -97,6 +97,8 @@ class LooperPlugin (GObject.Object, Peas.Activatable):
         # Locate position slider in the RB's toolbar
         # rb_toolbar = self.shell.props.ui_manager.get_widget('/ToolBar/')
         rb_toolbar = self.find(self.shell.props.window, 'ToolBar', 'by_name')
+        if not rb_toolbar:
+            rb_toolbar = self.find(self.shell.props.window, 'main-toolbar', 'by_id')
         self.rb_position_slider = self.find(rb_toolbar, 'GtkScale', 'by_name')
 
         # We need to disable cross fade while Looper is active. So store
