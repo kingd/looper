@@ -14,9 +14,17 @@ Screenshots
 Copy looper folder into your local `rhythmbox/plugins` directory. On Debian/Ubuntu 
 this is `~/.local/share/rhythmbox/plugins`. Following commands will install for those systems:
 
+# For RB bellow 2.*
+
     git clone https://github.com/kingd/looper
-    mv looper/looper ~/.local/share/rhythmbox/plugins
-    rm -rf looper
+    cd looper
+    bash install.sh -v rb2
+
+# For RB 3.0
+
+    git clone https://github.com/kingd/looper
+    cd looper
+    bash install.sh -v rb3
 
 ## Known Issues
 
@@ -27,11 +35,13 @@ disabled when the Looper is in control of the playback.
 Rhythmbox also changes to next song if the song is less than 3 seconds before the end.
 Therefore those last 3 seconds wont be available for looping.
 
-Currently tested only on Rhythmbox 2.97 and 2.99.1
+Tested on Rhythmbox 2.97, 2.99.1, 3.0
 
 ## TODO
 
-Try it on Rhythmbox 3+
+- add preferences for the position of the Looper in the RB UI
+- when the start slider moves, song should follow and when the end slider moves
+song should follow minus 2 seconds (so a user can hear where he is in the song)
 
 ## Author
 
