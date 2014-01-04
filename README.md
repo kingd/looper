@@ -16,25 +16,33 @@ this is `~/.local/share/rhythmbox/plugins`. Following commands will install for 
 
 1. Install requirements as `root` user
 
+```
     apt-get install git python python-gi
+```
 
 2. Install Looper as normal user
 
+```
     git clone https://github.com/kingd/looper
     cd looper
     bash install.sh -v rb2
+```
 
 ### For RB3
 
 1. Install requirements as `root` user
 
+```
     apt-get install git python3 python3-gi
+```
 
 2. Install Looper as normal user
 
+```
     git clone https://github.com/kingd/looper
     cd looper
     bash install.sh -v rb3
+```
 
 ## Known Issues
 
