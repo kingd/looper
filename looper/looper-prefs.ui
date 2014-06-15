@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<interface>
+  <!-- interface-requires gtk+ 2.12 -->
+  <!-- interface-naming-policy toplevel-contextual -->
+  <object class="GtkVBox" id="config">
+    <property name="visible">True</property>
+    <property name="border_width">5</property>
+    <property name="orientation">vertical</property>
+    <property name="spacing">10</property>
+    <child>
+      <object class="GtkFrame" id="frame1">
+        <property name="visible">True</property>
+        <property name="label_xalign">0</property>
+        <property name="shadow_type">none</property>
+
+
+            <child>
+            <object class="GtkHBox" id="hbox21">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+                <object class="GtkLabel" id="rb_looper_position_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xpad">8</property>
+                <property name="label" translatable="yes">Looper position in Rhythmbox GUI:</property>
+                <property name="use_underline">True</property>
+                </object>
+                <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkComboBox" id="rb_looper_position">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="model">locations</property>
+                <signal name="changed" handler="rb_looper_position_changed" swapped="no"/>
+                <child>
+                    <object class="GtkCellRendererText" id="renderer3"/>
+                    <attributes>
+                    <attribute name="text">0</attribute>
+                    </attributes>
+                </child>
+                </object>
+                <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+                </packing>
+            </child>
+            </object>
+            </child>
+
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+
+
+    <child>
+      <object class="GtkFrame" id="frame2">
+        <property name="visible">True</property>
+        <property name="label_xalign">0</property>
+        <property name="shadow_type">none</property>
+
+            <child>
+            <object class="GtkHBox" id="hbox2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+                <object class="GtkLabel" id="rb_looper_always_show_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xpad">8</property>
+                <property name="label" translatable="yes">Always show Looper GUI:</property>
+                <property name="use_underline">True</property>
+                </object>
+                <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+                </packing>
+            </child>
+            <child>
+                <object class="GtkCheckButton" id="rb_looper_always_show">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <signal name="toggled" handler="rb_looper_always_show_changed" swapped="no"/>
+                </object>
+            </child>
+            </object>
+            </child>
+
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+
+  </object>
+
+  <object class="GtkListStore" id="locations">
+    <columns>
+        <!-- column-name gchararray -->
+        <column type="gchararray"/>
+    </columns>
+    <data>
+        <row> <col id="0" translatable="yes">TOP</col> </row>
+        <row> <col id="0" translatable="yes">BOTTOM</col> </row>
+        <row> <col id="0" translatable="yes">SIDEBAR</col> </row>
+        <row> <col id="0" translatable="yes">RIGHT SIDEBAR</col> </row>
+    </data>
+  </object>
+</interface>

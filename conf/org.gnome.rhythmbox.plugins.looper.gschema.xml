@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.rhythmbox.plugins.looper" path="/org/gnome/rhythmbox/plugins/looper/">
+    <key name="position" type="s">
+      <default>'TOP'</default>
+      <summary>Looper's position in RB GUI</summary>
+      <description>Looper's position in RB GUI</description>
+    </key>
+    <key type="b" name="always-show">
+      <default>false</default>
+      <summary>Always show Looper GUI</summary>
+      <description>When checked Looper's GUI is always visible independent of its activity..</description>
+    </key>
+  </schema>
+</schemalist>

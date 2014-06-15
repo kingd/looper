@@ -1,10 +1,10 @@
 # Looper - Rhythmbox plugin
 
-Loop part of the song in Rhythmbox.
+Loop only part of the song in Rhythmbox.
 
 ## Screenshots
 
-![](http://image.bayimg.com/c8a2d58cae0089822ea946967a820ebe2a4b4824.jpg)
+![](http://image.bayimg.com/e30f16f05611d85b2b160d4b91e7c9ff0304b59c.jpg)
 
 
 ## Install
@@ -12,36 +12,25 @@ Loop part of the song in Rhythmbox.
 Copy looper folder into your local `rhythmbox/plugins` directory. On Debian/Ubuntu 
 this is `~/.local/share/rhythmbox/plugins`. Following commands will install for those systems:
 
-### For RB2
-
-1. Install requirements as `root` user
+1. Install requirements as `admin` user
 
 ```
-    apt-get install git python python-gi
+    sudo apt-get install git python python-gi
 ```
 
-2. Install Looper as normal user
+2. Install Looper as regular user
 
 ```
     git clone https://github.com/kingd/looper
     cd looper
-    bash install.sh -v rb2
+    python setup.py
 ```
 
-### For RB3
-
-1. Install requirements as `root` user
+3. Copy and compile settings as `admin` user
 
 ```
-    apt-get install git python3 python3-gi
-```
-
-2. Install Looper as normal user
-
-```
-    git clone https://github.com/kingd/looper
-    cd looper
-    bash install.sh -v rb3
+    sudo cp 'conf/org.gnome.rhythmbox.plugins.looper.gschema.xml' '/usr/share/glib-2.0/schemas/'
+    sudo glib-compile-schemas '/usr/share/glib-2.0/schemas/'
 ```
 
 ## Known Issues
@@ -50,16 +39,15 @@ this is `~/.local/share/rhythmbox/plugins`. Following commands will install for 
 current time is near the edges of the song. Thats why it will be temporary
 disabled when the Looper is in control of the playback. 
 
-Rhythmbox also changes to next song if the song is less than 3 seconds before the end.
+Rhythmbox changes to next song if the song is less than 3 seconds before the end.
 Therefore those last 3 seconds wont be available for looping.
 
-Tested on Rhythmbox 2.97, 2.99.1, 3.0
+Tested on Rhythmbox 2.97
 
 ## TODO
 
-- add preferences for the position of the Looper in the RB UI
-- when the start slider moves, song should follow and when the end slider moves
-song should follow minus 2 seconds (so a user can hear where he is in the song)
+- test on 2.99.1, 3.0 versions
+- port to Windows/MAC
 
 ## Author
 
