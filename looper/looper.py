@@ -25,6 +25,8 @@ from gi.repository import Gio, Gtk, GObject, RB, Peas
 from string import Template
 from LooperConfigureDialog import LooperConfigureDialog
 
+import rb
+
 
 class LooperPlugin(GObject.Object, Peas.Activatable):
     """
@@ -61,7 +63,6 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
           </toolbar>
         </ui>
     """
-    LOOPER_DIR = os.path.dirname(os.path.abspath(__file__))
 
     def __init__(self):
         super(LooperPlugin, self).__init__()
@@ -90,7 +91,7 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
                                        'Loop part of the song', "")
         self.action_group = Gtk.ActionGroup('LooperActionGroup')
         self.action_group.add_action(self.action)
-        ICON_PATH = os.path.join(self.LOOPER_DIR, 'looper.png')
+        ICON_PATH = rb.find_plugin_file(self, os.path.join('img', 'looper.png'))
         self.icon = Gio.FileIcon.new(Gio.File.new_for_path(ICON_PATH))
         self.action.set_gicon(self.icon)
         self.shell.props.ui_manager.insert_action_group(self.action_group)

@@ -29,7 +29,7 @@ this is `~/.local/share/rhythmbox/plugins`. Following commands will install for 
 3. Copy and compile settings as `admin` user
 
 ```
-    sudo cp 'conf/org.gnome.rhythmbox.plugins.looper.gschema.xml' '/usr/share/glib-2.0/schemas/'
+    sudo cp 'looper/schema//org.gnome.rhythmbox.plugins.looper.gschema.xml' '/usr/share/glib-2.0/schemas/'
     sudo glib-compile-schemas '/usr/share/glib-2.0/schemas/'
 ```
 
