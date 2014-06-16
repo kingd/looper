@@ -14,24 +14,24 @@ this is `~/.local/share/rhythmbox/plugins`. Following commands will install for 
 
 1. Install requirements as `admin` user
 
-```
+    ```
     sudo apt-get install git python python-gi
-```
+    ```
 
 2. Install Looper as regular user
 
-```
+    ```
     git clone https://github.com/kingd/looper
     cd looper
     python setup.py
-```
+    ```
 
 3. Copy and compile settings as `admin` user
 
-```
+    ```
     sudo cp 'looper/schema//org.gnome.rhythmbox.plugins.looper.gschema.xml' '/usr/share/glib-2.0/schemas/'
     sudo glib-compile-schemas '/usr/share/glib-2.0/schemas/'
-```
+    ```
 
 ## Known Issues
 
@@ -51,4 +51,8 @@ Tested on Rhythmbox 2.97
 
 ## Author
 
-Ivan Augustinović https://github.com/kingd
+[kingd](https://github.com/kingd/)
+
+## Contributors
+
+[fossfreedom](https://github.com/fossfreedom/)
