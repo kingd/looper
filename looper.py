@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
+# -*- Mode: python; coding: utf-8; tab-width: 4; indent-tabs-mode: nil; -*-
 ###############################################################################
 # Copyright 2013 Ivan Augustinović
 #
@@ -24,6 +22,8 @@ import os
 from gi.repository import Gio, Gtk, GObject, RB, Peas
 from string import Template
 from LooperConfigureDialog import LooperConfigureDialog
+from looper_rb3compat import ActionGroup
+from looper_rb3compat import ApplicationShell
 
 import rb
 
@@ -56,12 +56,13 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
     }
 
     UI = """
-        <ui>
-          <toolbar name="ToolBar">
-            <toolitem name="LooperPlugin" action="ActivateLooper"/>
-            <separator/>
-          </toolbar>
-        </ui>
+    <ui>
+        <menubar name="MenuBar">
+            <menu name="ViewMenu" action="View">
+                <menuitem name="LooperPlugin" action="ActivateLooper" />
+            </menu>
+        </menubar>
+    </ui>
     """
 
     def __init__(self):
@@ -87,16 +88,20 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
     def create_widgets(self):
         """Create, show and add looper's GTK widgets to RB's window."""
         # Activation button, part of the main RB toolbar
-        self.action = Gtk.ToggleAction('ActivateLooper', 'Looper',
-                                       'Loop part of the song', "")
-        self.action_group = Gtk.ActionGroup('LooperActionGroup')
-        self.action_group.add_action(self.action)
-        ICON_PATH = rb.find_plugin_file(self, os.path.join('img', 'looper.png'))
-        self.icon = Gio.FileIcon.new(Gio.File.new_for_path(ICON_PATH))
-        self.action.set_gicon(self.icon)
-        self.shell.props.ui_manager.insert_action_group(self.action_group)
-        self.ui_id = self.shell.props.ui_manager.add_ui_from_string(self.UI)
-
+        self.appshell = ApplicationShell(self.shell)
+        
+        self.toggle_action_group = ActionGroup(self.shell, 'LooperActionGroup')
+        self.toggle_action_group.add_action(func=self.looper_toggled,
+            action_name='ActivateLooper', label=_("Looper"), action_state=ActionGroup.TOGGLE,
+            action_type='app', accel="<Ctrl>l", tooltip=_("Loop part of the song"))
+        self.appshell.insert_action_group(self.toggle_action_group)
+        self.appshell.add_app_menuitems(self.UI, 'LooperActionGroup', 'view')
+        self.action = self.appshell.lookup_action('LooperActionGroup', 'ActivateLooper', 'app')
+        
+        #ICON_PATH = rb.find_plugin_file(self, 'img/looper.png')
+        #self.icon = Gio.FileIcon.new(Gio.File.new_for_path(ICON_PATH))
+        #self.action.set_gicon(self.icon)
+        
         # Main horizontal box
         self.hbox = Gtk.HBox()
 
@@ -195,9 +200,7 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         # Min range change
         self.min_range_cv = self.min_range.connect(
             'value-changed', self.min_range_changed)
-        # Looper activation
-        self.activate_sid = self.action.connect(
-            'activate', self.looper_toggled, self.shell)
+        
         # Song change
         self.player_psc_id = self.player.connect(
             "playing-song-changed", self.playing_song_changed)
@@ -294,9 +297,10 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         m, s = divmod(int(seconds), 60)
         return "%02d:%02d" % (m, s)
 
-    def looper_toggled(self, button, shell=None):
+    def looper_toggled(self, *args):
 
-        if button.get_active():
+        action = self.toggle_action_group.get_action('ActivateLooper')
+        if action.get_active():
             # connect elapsed handler/signal to handle the loop
             self.player_sid = self.player.connect("elapsed-changed", self.loop)
 
@@ -378,7 +382,6 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         del self.player
 
     def discconect_signals(self):
-        self.action.disconnect(self.activate_sid)
         self.player.disconnect(self.player_psc_id)
         if hasattr(self, 'player_sid'):
             self.player.disconnect(self.player_sid)
@@ -388,16 +391,12 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.end_slider.disconnect(self.end_slider_vc_id)
 
     def destroy_widgets(self):
-        self.shell.props.ui_manager.remove_action_group(self.action_group)
-        self.shell.props.ui_manager.remove_ui(self.ui_id)
+        self.appshell.cleanup()
         self.hbox.set_visible(False)
         self.shell.remove_widget(self.hbox, RB.ShellUILocation.MAIN_TOP)
         if hasattr(self, 'rb_position_slider'):
             self.rb_position_slider.clear_marks()
             del self.rb_position_slider
-        del self.action
-        del self.action_group
-        del self.icon
         del self.hbox
         del self.min_range_label
         del self.min_range

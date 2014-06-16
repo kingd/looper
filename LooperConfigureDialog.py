@@ -28,7 +28,7 @@ class LooperConfigureDialog(GObject.Object, PeasGtk.Configurable):
             "rb_looper_always_show_changed": set_looper_always_show,
         }
         builder = Gtk.Builder()
-        PREFS_PATH = rb.find_plugin_file(self, os.path.join('ui', 'looper-prefs.ui'))
+        PREFS_PATH = rb.find_plugin_file(self, 'ui/looper-prefs.ui')
         builder.add_from_file(PREFS_PATH)
 
         self.config = builder.get_object("config")
