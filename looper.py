@@ -68,6 +68,22 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
     def __init__(self):
         super(LooperPlugin, self).__init__()
         self.settings = Gio.Settings("org.gnome.rhythmbox.plugins.looper")
+        # old value will be needed  when removing/adding(moving) GUI
+        self.gui_position = self.POSITIONS[self.settings['position']]
+        self.settings.connect('changed', self.settings_changed)
+
+    def settings_changed(self, settings, setting):
+        if setting == 'position':
+            self.shell.remove_widget(self.hbox, self.gui_position)
+            position = self.POSITIONS[self.settings['position']]
+            self.shell.add_widget(self.hbox, position, True, False)
+            self.gui_position = self.POSITIONS[self.settings['position']]
+        elif setting == 'always-show':
+            if settings['always-show']:
+                self.hbox.show_all()
+            else:
+                if self.action.get_active() is not True:
+                    self.hbox.hide()
 
     def do_activate(self):
         self.shell = self.object
@@ -404,5 +420,6 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         del self.start_slider
         del self.end_slider
         del self.label
+        del self.button
         del self.cross_fade
         del self.cross_fade_active
