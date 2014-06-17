@@ -12,25 +12,22 @@ Loop only part of the song in Rhythmbox.
 Copy looper folder into your local `rhythmbox/plugins` directory. On Debian/Ubuntu 
 this is `~/.local/share/rhythmbox/plugins`. Following commands will install for those systems:
 
-1. Install requirements as `admin` user
+* For Rhythmbox 2.96 - 2.99
 
     ```
     sudo apt-get install git python python-gi
-    ```
-
-2. Install Looper as regular user
-
-    ```
     git clone https://github.com/kingd/looper
     cd looper
-    python setup.py
+    ./install.sh
     ```
 
-3. Copy and compile settings as `admin` user
+* For Rhythmbox 3.0+
 
     ```
-    sudo cp 'looper/schema//org.gnome.rhythmbox.plugins.looper.gschema.xml' '/usr/share/glib-2.0/schemas/'
-    sudo glib-compile-schemas '/usr/share/glib-2.0/schemas/'
+    sudo apt-get install git python3 python3-gi
+    git clone https://github.com/kingd/looper
+    cd looper
+    ./install.sh --rb3
     ```
 
 ## Known Issues
@@ -47,7 +44,6 @@ Tested on Rhythmbox 2.97
 ## TODO
 
 - test on 2.99.1, 3.0 versions
-- port to Windows/MAC
 
 ## Author
 

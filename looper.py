@@ -93,15 +93,11 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.toggle_action_group = ActionGroup(self.shell, 'LooperActionGroup')
         self.toggle_action_group.add_action(func=self.looper_toggled,
             action_name='ActivateLooper', label=_("Looper"), action_state=ActionGroup.TOGGLE,
-            action_type='app', accel="<Ctrl>l", tooltip=_("Loop part of the song"))
+            action_type='app', accel="<Ctrl>p", tooltip=_("Loop part of the song"))
         self.appshell.insert_action_group(self.toggle_action_group)
         self.appshell.add_app_menuitems(self.UI, 'LooperActionGroup', 'view')
         self.action = self.appshell.lookup_action('LooperActionGroup', 'ActivateLooper', 'app')
-        
-        #ICON_PATH = rb.find_plugin_file(self, 'img/looper.png')
-        #self.icon = Gio.FileIcon.new(Gio.File.new_for_path(ICON_PATH))
-        #self.action.set_gicon(self.icon)
-        
+
         # Main horizontal box
         self.hbox = Gtk.HBox()
 
@@ -112,6 +108,11 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
                              self.MIN_RANGE, 1, 10, 0)
         self.min_range = Gtk.SpinButton(adjustment=adj)
         self.hbox.pack_start(self.min_range, False, False, 0)
+
+        # Activation button, part of the looper box
+        self.button = Gtk.CheckButton()
+        self.button.set_related_action(self.action.action)
+        self.hbox.pack_start(self.button, True, False, 0)
 
         # status bar label
         self.label = Gtk.Label()
