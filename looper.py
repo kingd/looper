@@ -24,6 +24,7 @@ from string import Template
 from LooperConfigureDialog import LooperConfigureDialog
 from looper_rb3compat import ActionGroup
 from looper_rb3compat import ApplicationShell
+from looper_rb3compat import is_rb3
 
 import rb
 
@@ -125,10 +126,11 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.min_range = Gtk.SpinButton(adjustment=adj)
         self.hbox.pack_start(self.min_range, False, False, 0)
 
-        # Activation button, part of the looper box
-        self.button = Gtk.CheckButton()
-        self.button.set_related_action(self.action.action)
-        self.hbox.pack_start(self.button, True, False, 0)
+        if not is_rb3(self.shell):
+            # Activation button, part of the looper box
+            self.button = Gtk.CheckButton()
+            self.button.set_related_action(self.action.action)
+            self.hbox.pack_start(self.button, True, False, 0)
 
         # status bar label
         self.label = Gtk.Label()
@@ -420,6 +422,7 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         del self.start_slider
         del self.end_slider
         del self.label
-        del self.button
+        if not is_rb3(self.shell):
+            del self.button
         del self.cross_fade
         del self.cross_fade_active
