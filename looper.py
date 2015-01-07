@@ -19,7 +19,7 @@
 
 import sys
 import os
-from gi.repository import Gio, Gtk, GObject, RB, Peas
+from gi.repository import Gio, Gtk, GObject, RB, Peas, GLib
 from string import Template
 from LooperConfigureDialog import LooperConfigureDialog
 from looper_rb3compat import ActionGroup
@@ -110,10 +110,13 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.toggle_action_group = ActionGroup(self.shell, 'LooperActionGroup')
         self.toggle_action_group.add_action(func=self.looper_toggled,
             action_name='ActivateLooper', label=_("Looper"), action_state=ActionGroup.TOGGLE,
-            action_type='app', accel="<Ctrl>p", tooltip=_("Loop part of the song"))
+            action_type='app', accel="<Ctrl>e", tooltip=_("Loop part of the song"))
         self.appshell.insert_action_group(self.toggle_action_group)
         self.appshell.add_app_menuitems(self.UI, 'LooperActionGroup', 'view')
         self.action = self.appshell.lookup_action('LooperActionGroup', 'ActivateLooper', 'app')
+
+        if is_rb3(self.shell):
+            self.action.connect('change-state', self.on_change_state, '')
 
         # Main horizontal box
         self.hbox = Gtk.HBox()
@@ -130,6 +133,10 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
             # Activation button, part of the looper box
             self.button = Gtk.CheckButton()
             self.button.set_related_action(self.action.action)
+            self.hbox.pack_start(self.button, True, False, 0)
+        else:
+            self.button = Gtk.Button('Off')
+            self.button.connect('clicked', self.on_button_clicked)
             self.hbox.pack_start(self.button, True, False, 0)
 
         # status bar label
@@ -165,6 +172,25 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.cross_fade_active = False
         if self.cross_fade and self.cross_fade.get_active():
             self.cross_fade_active = True
+
+    def on_change_state(self, action, state, data):
+        if state:
+            self.button.set_label('On')
+        else:
+            self.button.set_label('Off')
+
+    def on_button_clicked(self, button):
+        label = self.button.get_label()
+        # It seems that the value of state parameter (True/False) has no
+        # effect on self.action.action.emit('activate', state) result, But
+        # it's required.
+        if label == 'On':
+            state = GLib.Variant('b', False)
+            label = 'Off'
+        else:
+            state = GLib.Variant('b', True)
+            label = 'On'
+        self.action.action.emit('activate', state)
 
     def refresh_status_label(self):
         status_vars = {'duration': '00:00', 'time': '00:00'}
@@ -422,7 +448,6 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         del self.start_slider
         del self.end_slider
         del self.label
-        if not is_rb3(self.shell):
-            del self.button
+        del self.button
         del self.cross_fade
         del self.cross_fade_active
