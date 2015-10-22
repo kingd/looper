@@ -2,10 +2,6 @@
 
 Loop only part of the song in Rhythmbox.
 
-## Screenshots
-
-![](http://image.bayimg.com/e30f16f05611d85b2b160d4b91e7c9ff0304b59c.jpg)
-
 
 ## Install
 
@@ -39,11 +35,13 @@ disabled when the Looper is in control of the playback.
 Rhythmbox changes to next song if the song is less than 3 seconds before the end.
 Therefore those last 3 seconds wont be available for looping.
 
-Tested on Rhythmbox 2.97
+Tested on Rhythmbox 3.2.1
 
 ## TODO
 
-- test on 2.99.1, 3.0 versions
+- test on older versions
+- clean up code
+- make a server to serve looper interface to browser
 
 ## Author
 
