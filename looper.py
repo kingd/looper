@@ -65,6 +65,8 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
 
     LOOPS_PER_ROW = 8
 
+    MAX_LOOPS_NUM = 32
+
     UI = """
     <ui>
         <menubar name="MenuBar">
@@ -440,6 +442,8 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         if song_id:
             if song_id not in self.loops:
                 self.loops[song_id] = []
+            if len(self.loops[song_id]) >= self.MAX_LOOPS_NUM:
+                return
             name = '{} - {}'.format(
                 self.seconds_to_time(self.start_slider.get_value()),
                 self.seconds_to_time(self.end_slider.get_value()),
