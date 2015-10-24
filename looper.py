@@ -67,6 +67,10 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
 
     MAX_LOOPS_NUM = 32
 
+    ON_LABEL = 'Enabled'
+
+    OFF_LABEL = 'Disabled'
+
     UI = """
     <ui>
         <menubar name="MenuBar">
@@ -132,7 +136,7 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.min_range = Gtk.SpinButton(adjustment=adj)
 
         if is_rb3(self.shell):
-            self.activation_btn = Gtk.Button('Off')
+            self.activation_btn = Gtk.Button(self.OFF_LABEL)
         else:
             self.activation_btn = Gtk.CheckButton()
             self.activation_btn.set_related_action(self.action.action)
@@ -297,9 +301,9 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         current activation state.
         """
         if state:
-            self.activation_btn.set_label('On')
+            self.activation_btn.set_label(self.ON_LABEL)
         else:
-            self.activation_btn.set_label('Off')
+            self.activation_btn.set_label(self.OFF_LABEL)
 
     def on_btn_activation(self, button):
         """
@@ -311,12 +315,12 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         # It seems that the value of state parameter (True/False) has no
         # effect on self.action.action.emit('activate', state) result, But
         # it's required.
-        if label == 'On':
+        if label == self.ON_LABEL:
             state = GLib.Variant('b', False)
-            label = 'Off'
+            label = self.OFF_LABEL
         else:
             state = GLib.Variant('b', True)
-            label = 'On'
+            label = self.ON_LABEL
         self.action.action.emit('activate', state)
 
     def on_min_range_changed(self, spinner):
