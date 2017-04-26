@@ -341,6 +341,10 @@ class Controls(Gtk.Grid):
 
         self.save_loop_btn = Gtk.Button(label='Save loop')
 
+        self.audiokaraoke = Gst.ElementFactory.make('audiokaraoke', None)
+        self.audiokaraoke_btn = Gtk.ToggleButton('Filter out speach')
+        self.audiokaraoke_sigid = self.audiokaraoke_btn.connect('clicked', self.on_audiokaraoke_toggle)
+
         self.min_range_label = Gtk.Label()
         self.min_range_label.set_text('Min range ')
         adj = Gtk.Adjustment(MIN_RANGE, MIN_RANGE, MIN_RANGE, 1, 10, 0)
@@ -360,15 +364,16 @@ class Controls(Gtk.Grid):
         self.end_slider = create_slider()
         self.end_slider.set_property('margin-right', 5)
 
-        self.attach(self.start_slider, 0, 0, 2, 2)
-        self.attach(self.end_slider, 2, 0, 2, 2)
+        self.attach(self.start_slider, 0, 0, 5, 2)
+        self.attach(self.end_slider, 5, 0, 5, 2)
 
-        self.attach(self.status_label, 0, 2, 4, 2)
+        self.attach(self.status_label, 0, 2, 10, 2)
 
-        self.attach(self.min_range_label, 0, 4, 1, 2)
-        self.attach(self.min_range, 1, 4, 1, 2)
-        self.attach(self.save_loop_btn, 2, 4, 1, 2)
-        self.attach(self.activation_btn, 3, 4, 1, 2)
+        self.attach(self.audiokaraoke_btn, 0, 4, 2, 2)
+        self.attach(self.min_range_label, 2, 4, 2, 2)
+        self.attach(self.min_range, 4, 4, 1, 2)
+        self.attach(self.save_loop_btn, 6, 4, 2, 2)
+        self.attach(self.activation_btn, 8, 4, 2, 2)
 
         if is_rb3(looper.shell):
             # In RB3 plugins cannot be activated from custom buttons so
@@ -399,8 +404,6 @@ class Controls(Gtk.Grid):
 
         self.save_loop_btn_sigid = self.save_loop_btn.connect(
             'clicked', looper.on_save_loop)
-
-
 
     def on_rb_activation(self, action, state, data):
         """
@@ -498,6 +501,12 @@ class Controls(Gtk.Grid):
             end_adj.set_upper(self.looper.end_slider_max)
             end_adj.set_value(self.looper.duration)
 
+    def on_audiokaraoke_toggle(self, button):
+        if button.get_active() is True:
+            self.looper.player.add_filter(self.audiokaraoke)
+        else:
+            self.looper.player.remove_filter(self.audiokaraoke)
+
     def destroy_widgets(self):
         if is_rb3(self.looper.shell):
             self.activation_btn.disconnect(self.activation_btn_sigid)
@@ -507,6 +516,7 @@ class Controls(Gtk.Grid):
         self.end_slider.disconnect(self.end_slider_changed_sigid)
         self.end_slider.disconnect(self.end_slider_value_sigid)
         self.save_loop_btn.disconnect(self.save_loop_btn_sigid)
+        self.audiokaraoke_btn.disconnect(self.audiokaraoke_sigid)
         del self.looper
         del self.save_loop_btn
         del self.min_range_label
@@ -515,6 +525,8 @@ class Controls(Gtk.Grid):
         del self.status_label
         del self.start_slider
         del self.end_slider
+        del self.audiokaraoke_btn
+        del self.audiokaraoke
 
 
 class LooperPlugin(GObject.Object, Peas.Activatable):
