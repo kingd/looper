@@ -32,6 +32,7 @@ from looper_rb3compat import ActionGroup
 from looper_rb3compat import ApplicationShell
 from looper_rb3compat import is_rb3
 
+from tuner import Tuner
 from LooperConfigureDialog import LooperConfigureDialog
 
 
@@ -285,6 +286,12 @@ class RbPitch(Gtk.Box):
         self.pitch = RbPitchElem('Pitch', self.DEFAULT_ADJUSTMENT, self.PITCH_PRESETS, self.on_pitch_preset)
         self.rate = RbPitchElem('Rate', self.DEFAULT_ADJUSTMENT, self.RATE_PRESETS, self.on_rate_preset)
 
+        self.gst_pitch = Gst.ElementFactory.make('pitch', None)
+        if self.gst_pitch:
+            self.looper.player.add_filter(self.gst_pitch)
+        else:
+            self.pack_start(Gtk.Label('pitch missing'), True, True, 0)
+
         self.pack_start(self.tempo, True, True, 0)
         self.pack_start(self.pitch, True, True, 0)
         self.pack_start(self.rate, True, True, 0)
@@ -292,9 +299,6 @@ class RbPitch(Gtk.Box):
         self.tempo_slider_sigid = self.tempo.slider.connect("value-changed", self.on_tempo_change)
         self.pitch_slider_sigid = self.pitch.slider.connect("value-changed", self.on_pitch_change)
         self.rate_slider_sigid = self.rate.slider.connect("value-changed", self.on_rate_change)
-
-        self.gst_pitch = Gst.ElementFactory.make('pitch', None)
-        self.looper.player.add_filter(self.gst_pitch)
 
     def on_tempo_preset(self, button):
         self.tempo.slider.set_value(button.value)
@@ -306,22 +310,26 @@ class RbPitch(Gtk.Box):
         self.rate.slider.set_value(button.value)
 
     def on_tempo_change(self, slider):
-        tempo = slider.get_value()
-        self.gst_pitch.set_property('tempo', tempo / 100)
+        if self.gst_pitch:
+            tempo = slider.get_value()
+            self.gst_pitch.set_property('tempo', tempo / 100)
 
     def on_pitch_change(self, slider):
-        pitch = slider.get_value()
-        self.gst_pitch.set_property('pitch', pitch / 100)
+        if self.gst_pitch:
+            pitch = slider.get_value()
+            self.gst_pitch.set_property('pitch', pitch / 100)
 
     def on_rate_change(self, slider):
-        rate = slider.get_value()
-        self.gst_pitch.set_property('rate', rate / 100)
+        if self.gst_pitch:
+            rate = slider.get_value()
+            self.gst_pitch.set_property('rate', rate / 100)
 
     def destroy_widgets(self):
         self.tempo.slider.disconnect(self.tempo_slider_sigid)
         self.pitch.slider.disconnect(self.pitch_slider_sigid)
         self.rate.slider.disconnect(self.rate_slider_sigid)
-        self.looper.player.remove_filter(self.gst_pitch)
+        if self.gst_pitch:
+            self.looper.player.remove_filter(self.gst_pitch)
         del self.tempo
         del self.pitch
         del self.rate
@@ -341,8 +349,11 @@ class Controls(Gtk.Grid):
 
         self.save_loop_btn = Gtk.Button(label='Save loop')
 
+        self.tuner_btn = Gtk.Button('Tuner')
+        self.tuner_sigid = self.tuner_btn.connect('clicked', self.on_tuner_btn_clicked)
+
         self.audiokaraoke = Gst.ElementFactory.make('audiokaraoke', None)
-        self.audiokaraoke_btn = Gtk.ToggleButton('Filter out speach')
+        self.audiokaraoke_btn = Gtk.ToggleButton('Filter out speech')
         self.audiokaraoke_sigid = self.audiokaraoke_btn.connect('clicked', self.on_audiokaraoke_toggle)
 
         self.min_range_label = Gtk.Label()
@@ -364,16 +375,17 @@ class Controls(Gtk.Grid):
         self.end_slider = create_slider()
         self.end_slider.set_property('margin-right', 5)
 
-        self.attach(self.start_slider, 0, 0, 5, 2)
-        self.attach(self.end_slider, 5, 0, 5, 2)
+        self.attach(self.start_slider, 0, 0, 6, 2)
+        self.attach(self.end_slider, 6, 0, 6, 2)
 
-        self.attach(self.status_label, 0, 2, 10, 2)
+        self.attach(self.status_label, 0, 2, 12, 2)
 
-        self.attach(self.audiokaraoke_btn, 0, 4, 2, 2)
-        self.attach(self.min_range_label, 2, 4, 2, 2)
-        self.attach(self.min_range, 4, 4, 1, 2)
-        self.attach(self.save_loop_btn, 6, 4, 2, 2)
-        self.attach(self.activation_btn, 8, 4, 2, 2)
+        self.attach(self.tuner_btn, 0, 4, 2, 2)
+        self.attach(self.audiokaraoke_btn, 2, 4, 2, 2)
+        self.attach(self.min_range_label, 4, 4, 2, 2)
+        self.attach(self.min_range, 6, 4, 1, 2)
+        self.attach(self.save_loop_btn, 8, 4, 2, 2)
+        self.attach(self.activation_btn, 10, 4, 2, 2)
 
         if is_rb3(looper.shell):
             # In RB3 plugins cannot be activated from custom buttons so
@@ -502,10 +514,18 @@ class Controls(Gtk.Grid):
             end_adj.set_value(self.looper.duration)
 
     def on_audiokaraoke_toggle(self, button):
-        if button.get_active() is True:
-            self.looper.player.add_filter(self.audiokaraoke)
+        if self.audiokaraoke:
+            if button.get_active() is True:
+                self.looper.player.add_filter(self.audiokaraoke)
+            else:
+                self.looper.player.remove_filter(self.audiokaraoke)
         else:
-            self.looper.player.remove_filter(self.audiokaraoke)
+            self.audiokaraoke_btn.set_label('audiokaraoke missing')
+
+    def on_tuner_btn_clicked(self, button):
+        tuner = Tuner([16, 21, 26, 31, 35, 40])
+        tuner.run()
+        tuner.destroy()
 
     def destroy_widgets(self):
         if is_rb3(self.looper.shell):
@@ -516,6 +536,7 @@ class Controls(Gtk.Grid):
         self.end_slider.disconnect(self.end_slider_changed_sigid)
         self.end_slider.disconnect(self.end_slider_value_sigid)
         self.save_loop_btn.disconnect(self.save_loop_btn_sigid)
+        self.tuner_btn.disconnect(self.tuner_sigid)
         self.audiokaraoke_btn.disconnect(self.audiokaraoke_sigid)
         del self.looper
         del self.save_loop_btn
@@ -525,6 +546,7 @@ class Controls(Gtk.Grid):
         del self.status_label
         del self.start_slider
         del self.end_slider
+        del self.tuner_btn
         del self.audiokaraoke_btn
         del self.audiokaraoke
 
@@ -871,6 +893,12 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
             return self.entry.get_string(RB.RhythmDBPropType.ARTIST)
         return ''
 
+    @property
+    def song_path(self):
+        if self.entry:
+            return self.entry.get_string(RB.RhythmDBPropType.LOCATION)
+        return ''
+
     def load_loops(self, loops):
         for index, loop in enumerate(loops):
             loop = loops[index]
@@ -925,10 +953,11 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         start = int(self.controls.start_slider.get_value())
         end = int(self.controls.end_slider.get_value())
 
-        tempo = self.rbpitch.tempo.slider.get_value()
-        rate = self.rbpitch.rate.slider.get_value()
-        start = math.floor(start / (tempo / 100) / (rate / 100))
-        end = math.ceil(end / (tempo / 100) / (rate / 100))
+        if self.rbpitch.gst_pitch:
+            tempo = self.rbpitch.tempo.slider.get_value()
+            rate = self.rbpitch.rate.slider.get_value()
+            start = math.floor(start / (tempo / 100) / (rate / 100))
+            end = math.ceil(end / (tempo / 100) / (rate / 100))
 
         if elapsed < start:
             # current time is bellow Start slider so fast forward
