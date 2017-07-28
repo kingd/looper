@@ -608,7 +608,7 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         self.main_box.set_orientation(Gtk.Orientation.VERTICAL)
 
         self.controls_box = Gtk.Box()
-        self.controls_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.controls_box.set_orientation(Gtk.Orientation.VERTICAL)
 
         self._create_main_action()
 
