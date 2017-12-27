@@ -287,9 +287,7 @@ class RbPitch(Gtk.Box):
         self.rate = RbPitchElem('Rate', self.DEFAULT_ADJUSTMENT, self.RATE_PRESETS, self.on_rate_preset)
 
         self.gst_pitch = Gst.ElementFactory.make('pitch', None)
-        if self.gst_pitch:
-            self.looper.player.add_filter(self.gst_pitch)
-        else:
+        if not self.gst_pitch:
             self.pack_start(Gtk.Label('pitch missing'), True, True, 0)
 
         self.pack_start(self.tempo, True, True, 0)
@@ -356,6 +354,9 @@ class Controls(Gtk.Grid):
         self.audiokaraoke_btn = Gtk.ToggleButton('Filter out speech')
         self.audiokaraoke_sigid = self.audiokaraoke_btn.connect('clicked', self.on_audiokaraoke_toggle)
 
+        self.rbpitch_btn = Gtk.ToggleButton('T/P/R')
+        self.rbpitch_sigid = self.rbpitch_btn.connect('clicked', self.on_rbpitch_toggle)
+
         self.min_range_label = Gtk.Label()
         self.min_range_label.set_text('Min range ')
         adj = Gtk.Adjustment(MIN_RANGE, MIN_RANGE, MIN_RANGE, 1, 10, 0)
@@ -375,17 +376,18 @@ class Controls(Gtk.Grid):
         self.end_slider = create_slider()
         self.end_slider.set_property('margin-right', 5)
 
-        self.attach(self.start_slider, 0, 0, 6, 2)
-        self.attach(self.end_slider, 6, 0, 6, 2)
+        self.attach(self.start_slider, 0, 0, 7, 2)
+        self.attach(self.end_slider, 7, 0, 7, 2)
 
-        self.attach(self.status_label, 0, 2, 12, 2)
+        self.attach(self.status_label, 0, 2, 14, 2)
 
         self.attach(self.tuner_btn, 0, 4, 2, 2)
         self.attach(self.audiokaraoke_btn, 2, 4, 2, 2)
-        self.attach(self.min_range_label, 4, 4, 2, 2)
-        self.attach(self.min_range, 6, 4, 1, 2)
-        self.attach(self.save_loop_btn, 8, 4, 2, 2)
-        self.attach(self.activation_btn, 10, 4, 2, 2)
+        self.attach(self.rbpitch_btn, 4, 4, 2, 2)
+        self.attach(self.min_range_label, 6, 4, 2, 2)
+        self.attach(self.min_range, 8, 4, 1, 2)
+        self.attach(self.save_loop_btn, 10, 4, 2, 2)
+        self.attach(self.activation_btn, 12, 4, 2, 2)
 
         if is_rb3(looper.shell):
             # In RB3 plugins cannot be activated from custom buttons so
@@ -527,6 +529,15 @@ class Controls(Gtk.Grid):
         tuner.run()
         tuner.destroy()
 
+    def on_rbpitch_toggle(self, button):
+        if self.looper.rbpitch.gst_pitch:
+            if button.get_active() is True:
+                self.looper.player.add_filter(self.looper.rbpitch.gst_pitch)
+            else:
+                self.looper.player.remove_filter(self.looper.rbpitch.gst_pitch)
+        else:
+            self.rbpitch_btn.set_label('pitch missing')
+
     def destroy_widgets(self):
         if is_rb3(self.looper.shell):
             self.activation_btn.disconnect(self.activation_btn_sigid)
@@ -538,6 +549,7 @@ class Controls(Gtk.Grid):
         self.save_loop_btn.disconnect(self.save_loop_btn_sigid)
         self.tuner_btn.disconnect(self.tuner_sigid)
         self.audiokaraoke_btn.disconnect(self.audiokaraoke_sigid)
+        self.rbpitch_btn.disconnect(self.rbpitch_sigid)
         del self.looper
         del self.save_loop_btn
         del self.min_range_label
@@ -547,6 +559,7 @@ class Controls(Gtk.Grid):
         del self.start_slider
         del self.end_slider
         del self.tuner_btn
+        del self.rbpitch_btn
         del self.audiokaraoke_btn
         del self.audiokaraoke
 
@@ -953,7 +966,7 @@ class LooperPlugin(GObject.Object, Peas.Activatable):
         start = int(self.controls.start_slider.get_value())
         end = int(self.controls.end_slider.get_value())
 
-        if self.rbpitch.gst_pitch:
+        if self.rbpitch.gst_pitch and self.controls.rbpitch_btn.get_active() is True:
             tempo = self.rbpitch.tempo.slider.get_value()
             rate = self.rbpitch.rate.slider.get_value()
             start = math.floor(start / (tempo / 100) / (rate / 100))
